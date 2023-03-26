@@ -1,0 +1,82 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Survey</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <link rel="stylesheet" href="survey_styles.css"> -->
+</head>
+<body>
+    <div id = "info" style="margin: 0 auto;">
+    <h1><center>Temple Styles Survey</center></h1>
+    <p><center><b>Please go through these images and choose the one that you like, click on submit to move on to the next pair.</center></p>
+    </div>
+    <div id = 'countdown_timer'>
+        <script>
+            var count = 5;
+            var timer = setInterval(function() {
+                count--;
+                if (count == 0) {
+                    clearInterval(timer);
+                }
+                document.getElementById("countdown").innerHTML = count;
+            }, 1000);
+        </script>
+        <!-- <h5><center>Countdown Timer</center></h5> -->
+        <h3><center><span id="countdown">5</span></center></h3>
+    </div>
+
+    <form method="post" action="/submit">
+        <div>
+          <img src="{{ img1[1] }}">
+          <input type="radio" name="selection" value="{{ img1[0] }}" required>
+
+          <img src="{{ img2[1] }}">
+          <input type="radio" name="selection" value="{{ img2[0] }}" required>
+        </div>
+        <input type="hidden" name="img1" value="{{ img1[0] }}">
+        <input type="hidden" name="img2" value="{{ img2[0] }}">
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+
+    <script>
+
+        setTimeout(function(){
+        window.location.reload();
+        }, 5000);
+    
+        // $(document).ready(function() {
+        //     // Show the initial image pair
+        //     getNewImagePair();
+
+        //     // Submit the form when the user selects an image
+        //     $('#image-container img').click(function() {
+        //         var selectedImage = $(this).attr('src');
+        //         $('#selected-image').val(selectedImage);
+        //         $('#survey-form').submit();
+        //     });
+        // });
+
+        // function getNewImagePair() {
+        //     $.ajax({
+        //         url: '/get_images',
+        //         type: 'GET',
+        //         success: function(data) {
+        //             var images = data.images;
+        //             var imagePair = data.pair;
+        //             $('#image1').attr('src', images[0]);
+        //             $('#image2').attr('src', images[1]);
+        //             $('#image-pair').val(imagePair);
+        //             setTimeout(getNewImagePair, 20000);
+        //         }
+        //     });
+        // }
+    </script>
+</body>
+</html>
+
+{% endblock %}
+
