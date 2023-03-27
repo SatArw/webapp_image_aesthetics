@@ -23,16 +23,16 @@ def home():
     return render_template("home.html", user=current_user)
 
 
-@views.route('/survey')
+@views.route('/select')
 @login_required
-def survey():
+def select():
     # select two random images from the database
     cur = conn.cursor()
     cur.execute("SELECT img_id, link FROM images ORDER BY RANDOM() LIMIT 2")
     rows = cur.fetchall()
     img1 = rows[0]
     img2 = rows[1]
-    # render the survey page with the two images
+    # render the select page with the two images
     return render_template('survey.html', img1=img1, img2=img2, user=current_user)
 
 
@@ -47,7 +47,7 @@ def submit():
     # insert the data into the database
     cur = conn.cursor()
     cur.execute("INSERT INTO data (user_id, session_id, img1, img2, selection) VALUES (?, ?, ?, ?, ?)",
-                (user_id, session_id, img1, img2, selection)) 
+                (user_id, session_id, img1, img2, selection))
     conn.commit()
     # redirect to the home page to show the next pair of images
-    return redirect(url_for('views.survey'))
+    return redirect(url_for('views.select'))
