@@ -1,29 +1,25 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
 %}
-
 <h1 align="center">Welcome</h1>
 <br>
 <br>
 <br>
 
 <p>
-  <center><h5>Hello there! Please take these surveys.You will be presented a set of pair of images and you need to choose one that you like. Each pair will be shown for 5 seconds.</h5></center>
+  <center>
+    <h5>Hello there! Please take these surveys.You will be presented a set of pair of images and you need to choose one
+      that you like. Each pair will be shown for 5 seconds.</h5>
+  </center>
 </p>
 <br>
 <br>
 <br>
 
-<form action = "/survey">
+<form action="/select">
   <!-- <textarea name="note" id="note" class="form-control"></textarea> -->
   <br />
   <div align="center">
-    <button type="submit" class="btn btn-primary" >Temple Style Survey</button>
-  </div>
-</form> 
-<form action ="/aspect_ratio_survey">
-  <br/>
-  <div align="center">
-  <button type="submit" class="btn btn-primary" >Aspect ratio Survey</button>
+    <button type="submit" class="btn btn-primary">Start Survey</button>
   </div>
 </form>
 
