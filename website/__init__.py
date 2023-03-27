@@ -13,11 +13,11 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
     app.secret_key = "Dop89#$tcv"
-    from .run import run
+    # from .run import run
     from .views import views
     from .auth import auth
 
-    app.register_blueprint(run, url_prefix='/')
+    # app.register_blueprint(run, url_prefix='/survey')
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(views, url_prefix='/')
 
