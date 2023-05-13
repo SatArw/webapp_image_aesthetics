@@ -49,14 +49,14 @@
                 <center><span id="countdown">5</span></center>
             </h3>
         </div>
-        <form id="surveyForm" method="post" action="/submit">
+        <form id="surveyForm" method="post" action="/aspect_submit">
             <input type="hidden" name="user_id" value="{{ user }}">
             <input type="hidden" name="sess_id" value="{{ sess_id }}">
-            <div id="img_container" align="center">
+            <div id="img_container" align="center" >
                 <div id=" imgs">
-                    <img src="{{ img1[1] }}" width="400" height="400" style="border: medium solid black"
+                    <img src="{{ img1[1] }}" style="border: medium solid black"
                         onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
-                    <img src="{{ img2[1] }}" width="400" height="400" style="border: medium solid black"
+                    <img src="{{ img2[1] }}" style="border: medium solid black"
                         onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
                 </div>
             </div>

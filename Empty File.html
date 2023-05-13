@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Survey</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <form method="POST" action="{{ url_for('submit_survey') }}">
+        {% for pair in image_pairs %}
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <label class="btn btn-secondary">
+                <input type="radio" name="selection" value="{{ pair.img1 }}" autocomplete="off">{{ pair.img1 }}
+            </label>
+            <label class="btn btn-secondary">
+                <input type="radio" name="selection" value="{{ pair.img2 }}" autocomplete="off">{{ pair.img2 }}
+            </label>
+        </div>
+        {% endfor %}
+        <br><br>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Survey</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <link rel="stylesheet" href="survey_styles.css"> -->
+</head>
+
+<body>
+    <div id="info" style="margin: 0 auto;">
+        <h1>
+            <center>Temple Styles Survey</center>
+        </h1>
+        <p>
+            <center><b>Please go through these images and choose the one that you like, click on submit to move on to
+                    the next pair.</center>
+        </p>
+    </div>
+    <div id='countdown_timer'>
+        <script>
+            var count = 5;
+            var timer = setInterval(function () {
+                count--;
+                if (count == 0) {
+                    clearInterval(timer);
+                }
+                document.getElementById("countdown").innerHTML = count;
+            }, 1000);
+        </script>
+        <!-- <h5><center>Countdown Timer</center></h5> -->
+        <h3>
+            <center><span id="countdown">5</span></center>
+        </h3>
+    </div>
+
+    <form method="post" action="/submit">
+        <div>
+            <img src="{{ img1[1] }}">
+            <button type="btn btn-default" name="selection" value="{{ img1[0] }}" required></button>
+
+            <img src="{{ img2[1] }}">
+            <button type="btn btn-default" name="selection" value="{{ img2[0] }}" required></button>
+        </div>
+        <input type="hidden" name="img1" value="{{ img1[0] }}">
+        <input type="hidden" name="img2" value="{{ img2[0] }}">
+        <input type="submit" value="Submit">
+    </form>
+    </div>
+
+    <script>
+
+        setTimeout(function () {
+            window.location.reload();
+        }, 5000);
+
+        // $(document).ready(function() {
+        //     // Show the initial image pair
+        //     getNewImagePair();
+
+        //     // Submit the form when the user selects an image
+        //     $('#image-container img').click(function() {
+        //         var selectedImage = $(this).attr('src');
+        //         $('#selected-image').val(selectedImage);
+        //         $('#survey-form').submit();
+        //     });
+        // });
+
+        // function getNewImagePair() {
+        //     $.ajax({
+        //         url: '/get_images',
+        //         type: 'GET',
+        //         success: function(data) {
+        //             var images = data.images;
+        //             var imagePair = data.pair;
+        //             $('#image1').attr('src', images[0]);
+        //             $('#image2').attr('src', images[1]);
+        //             $('#image-pair').val(imagePair);
+        //             setTimeout(getNewImagePair, 20000);
+        //         }
+        //     });
+        // }
+    </script>
+</body>
+
+</html>
+
+{% endblock %}
+
+
+
+<!doctype html>
+<html>
+  <head>
+    <title>Image Survey</title>
+    <script>
+      function submitForm(selection, img1, img2) {
+        var form = document.getElementById("surveyForm");
+        var selectionInput = document.getElementById("selectionInput");
+        var img1Input = document.getElementById("img1Input");
+        var img2Input = document.getElementById("img2Input");
+        selectionInput.value = selection;
+        img1Input.value = img1;
+        img2Input.value = img2;
+        form.submit();
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Image Survey</h1>
+    <form id="surveyForm" method="post" action="/submit">
+      <div>
+        <img src="{{ img1[1] }}" width="200" height="200" onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+        <br>
+        <button onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Select Image 1</button>
+      </div>
+      <div>
+        <img src="{{ img2[1] }}" width="200" height="200" onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+        <br>
+        <button onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Select Image 2</button>
+      </div>
+      <input type="hidden" id="selectionInput" name="selection">
+      <input type="hidden" id="img1Input" name="img1">
+      <input type="hidden" id="img2Input" name="img2">
+    </form>
+  </body>
+</html>
+

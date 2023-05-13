@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+<!doctype html>
+<html>
+
+<head>
+    <title>Image Survey</title>
+    <script>
+        function submitForm(selection, img1, img2) {
+            var form = document.getElementById("surveyForm");
+            var selectionInput = document.getElementById("selectionInput");
+            var img1Input = document.getElementById("img1Input");
+            var img2Input = document.getElementById("img2Input");
+            selectionInput.value = selection;
+            img1Input.value = img1;
+            img2Input.value = img2;
+            form.submit();
+        }
+
+        setTimeout(function () {
+            window.location.reload();
+        }, 5000);
+    </script>
+</head>
+
+<body>
+    <div id="info" style="margin: 0 auto;">
+        <h1>
+            <center>Temple Styles Survey</center>
+        </h1>
+        <p>
+            <center><b>Please go through these images and choose the one that you like, click on submit to move on to
+                    the next pair.</center>
+        </p>
+    </div>
+    <div id='countdown_timer'>
+        <script>
+            var count = 5;
+            var timer = setInterval(function () {
+                count--;
+                if (count == 0) {
+                    clearInterval(timer);
+                }
+                document.getElementById("countdown").innerHTML = count;
+            }, 1000);
+        </script>
+        <!-- <h5><center>Countdown Timer</center></h5> -->
+        <h3>
+            <center><span id="countdown">5</span></center>
+        </h3>
+    </div>
+    <form id="surveyForm" method="post" action="/submit">
+        <input type="hidden" name="user_id" value="{{ user }}">
+        <input type="hidden" name="sess_id" value="{{ sess_id }}">
+        <div id="img_container" align="center">
+            <div id=" imgs">
+                <img src="{{ img1[1] }}" width="400" height="400" style="border: medium solid black"
+                    onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+                <img src="{{ img2[1] }}" width="400" height="400" style="border: medium solid black"
+                    onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+            </div>
+        </div>
+        <input type="hidden" id="selectionInput" name="selection">
+        <input type="hidden" id="img1Input" name="img1">
+        <input type="hidden" id="img2Input" name="img2">
+    </form>
+</body>
+
+</html>
+
+
+{% endblock %}
