@@ -53,7 +53,7 @@ def select():
     # if all images are done, render the home page
     if len(lis) == 0:
         flash("Survey completed. Your responses have been recorded. Thank you!")
-        return render_template('home.html', user=current_user)
+        return redirect(url_for('views.thank_you'))
 
     # make random choices and select those images
     i1 = random.choice(lis)
@@ -68,9 +68,6 @@ def select():
     global start_time
     start_time = time.time()
     return render_template('survey.html', img1=image1, img2=image2, user=current_user)
-
-
-
 
 @ views.route('/submit', methods=['POST'])
 @ login_required
@@ -90,7 +87,7 @@ def submit():
     # redirect to the home page to show the next pair of images
     return redirect(url_for('views.select'))
 
-#Routes for aspect ratio survey
+"""Routes for aspect ratio survey"""
 
 @views.route('/aspect_select')
 @login_required
@@ -110,7 +107,7 @@ def aspect_select():
     # if all images are done, render the home page
     if len(lis) == 0:
         flash("Survey completed. Your responses have been recorded. Thank you!")
-        return render_template('home.html', user=current_user)
+        return redirect(url_for('views.thank_you'))
 
     # make random choices and select those images
     i1 = random.choice(lis)
@@ -143,3 +140,8 @@ def aspect_submit():
     conn.commit()
     # redirect to the home page to show the next pair of images
     return redirect(url_for('views.aspect_select'))
+
+@ views.route('/thank_you')
+@ login_required
+def thank_you():
+    return render_template('thank_you.html',user=current_user)
