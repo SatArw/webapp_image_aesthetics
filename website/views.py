@@ -52,7 +52,6 @@ def select():
 
     # if all images are done, render the home page
     if len(lis) == 0:
-        flash("Survey completed. Your responses have been recorded. Thank you!")
         return redirect(url_for('views.thank_you'))
 
     # make random choices and select those images
@@ -106,7 +105,6 @@ def aspect_select():
 
     # if all images are done, render the home page
     if len(lis) == 0:
-        flash("Survey completed. Your responses have been recorded. Thank you!")
         return redirect(url_for('views.thank_you'))
 
     # make random choices and select those images
@@ -144,4 +142,4 @@ def aspect_submit():
 @ views.route('/thank_you')
 @ login_required
 def thank_you():
-    return render_template('thank_you.html',user=current_user)
+    return render_template('thankyou.html')
