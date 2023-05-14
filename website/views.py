@@ -47,7 +47,7 @@ def select():
     cursorObject.execute(
         "SELECT img1, img2 FROM data WHERE session_id = '{}' ".format(sess))  # select images from the database with same session_id so that they can be removed.
     res = cursorObject.fetchall()
-
+    sess_limit = True if len(res) == 40 else False
     # make a list of all such rows and delete them
     lis = list(range(1, total_imgs+1))
     for x in res:
@@ -55,7 +55,7 @@ def select():
         lis.remove(x[1])
 
     # if all images are done, render the home page
-    if len(lis) == 0:
+    if len(lis) == 0 or sess_limit:
         return redirect(url_for('views.thank_you'))
 
     # make random choices and select those images
@@ -101,15 +101,16 @@ def aspect_select():
     cursorObject.execute(
         "SELECT img1, img2 FROM aspect_data WHERE session_id = '{}' ".format(sess))  # select images from the database with same session_id so that they can be removed.
     res = cursorObject.fetchall()
-
+    sess_limit = True if len(res) == 40 else False
     # make a list of all such rows and delete them
     lis = list(range(1, total_imgs_aspect+1))
+    
     for x in res:
         lis.remove(x[0])
         lis.remove(x[1])
 
     # if all images are done, render the home page
-    if len(lis) == 0:
+    if len(lis) == 0 or sess_limit:
         return redirect(url_for('views.thank_you'))
 
     # make random choices and select those images
