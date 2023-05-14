@@ -140,5 +140,6 @@ def aspect_submit():
     return redirect(url_for('views.aspect_select'))
 
 @ views.route('/thank_you')
+@login_required
 def thank_you():
-    return render_template("thankyou.html")
+    return render_template("thankyou.html",user= current_user)
