@@ -25,9 +25,9 @@ cur.execute('SELECT * FROM aspect_images')
 imgs = cur.fetchall()
 total_imgs_aspect = len(imgs)
 
-cur.execute('SELECT * from audios')
-auds = cur.fetchall()
-total_auds = len(auds)
+# cur.execute('SELECT * from audios')
+# auds = cur.fetchall()
+# total_auds = len(auds)
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -90,7 +90,7 @@ def submit():
     # redirect to the home page to show the next pair of images
     return redirect(url_for('views.select'))
 
-###################################
+################################
 # Routes for aspect ratio survey
 
 @views.route('/aspect_select')
@@ -144,8 +144,9 @@ def aspect_submit():
     # redirect to the home page to show the next pair of images
     return redirect(url_for('views.aspect_select'))
 
-############################
+########################
 #Routes for audio survey
+
 @views.route('/audio_select')
 @login_required
 def audio_select():
@@ -161,11 +162,11 @@ def audio_select():
         lis.remove(x[0])
         lis.remove(x[1])
 
-    # if all images are done, render the home page
+    # if all audios are done, render the home page
     if len(lis) == 0:
         return redirect(url_for('views.thank_you'))
 
-    # make random choices and select those images
+    # make random choices and select those audios
     i1 = random.choice(lis)
     lis.remove(i1)
     i2 = random.choice(lis)
@@ -182,7 +183,7 @@ def audio_select():
 @ views.route('/audio_submit', methods=['POST'])
 @ login_required
 def audio_submit():
-    # get the user's selection and the two images that were shown
+    # get the user's selection and the two audios that were shown
     user_id = request.form['user_id']
     selection = request.form['selection']
     aud1 = request.form['aud1']
@@ -194,8 +195,8 @@ def audio_submit():
     cur.execute("INSERT INTO audio_data (user_id, session_id, aud1, aud2, selection, time_taken) VALUES (?, ?, ?, ?, ?,?)",
                 (user_id, sess_idntfr, aud1, aud2, selection,time_taken_))
     conn.commit()
-    # redirect to the home page to show the next pair of images
-    return redirect(url_for('views.aspect_select'))
+    # redirect to the survey page to show the next pair of audios
+    return redirect(url_for('views.audio_select'))
 
 
 ###########################

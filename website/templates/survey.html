@@ -21,6 +21,26 @@
             window.location.reload();
         }, 5000);
     </script>
+    <style>
+            .flex-container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                }
+            .flex2{
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: space-evenly;
+                padding: 2%;
+            }
+        
+            img:hover {
+                border: 2px solid red;
+            }
+    </style>
+
 </head>
 
 <body>
@@ -52,11 +72,13 @@
     <form id="surveyForm" method="post" action="/submit">
         <input type="hidden" name="user_id" value="{{ user }}">
         <input type="hidden" name="sess_id" value="{{ sess_id }}">
-        <div id="img_container" align="center">
-            <div id=" imgs">
-                <img src="{{ img1[1] }}" width="400" height="400" style="border: medium solid black"
+        <div id="img_container" align="center" class="flex-container">
+            <div id="imgs1" style="border: thin solid black" class = "flex2">
+                <img src="{{ img1[1] }}" width="400" height="400" 
                     onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
-                <img src="{{ img2[1] }}" width="400" height="400" style="border: medium solid black"
+            </div>
+            <div id="imgs2" style="border: thin solid black" class = "flex2">
+                <img src="{{ img2[1] }}" width="400" height="400" 
                     onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
             </div>
         </div>
@@ -65,6 +87,7 @@
         <input type="hidden" id="img2Input" name="img2">
     </form>
 </body>
+
 
 </html>
 
