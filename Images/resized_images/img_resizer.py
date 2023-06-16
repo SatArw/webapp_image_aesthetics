@@ -11,6 +11,7 @@ def resize_channels(img,new_h,new_b):
 
 input_dir = "/home/satarw/webapp_image_aesthetics/Images/Orginal_temple_images"
 output_dir = "/home/satarw/webapp_image_aesthetics/Images/resized_images"
+
 for filename in os.listdir(input_dir):
     img = cv.imread(os.path.join(input_dir,filename))
     img = resize_channels(img,256,256)

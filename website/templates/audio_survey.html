@@ -6,16 +6,33 @@
     <head>
         <title>Audio Survey</title>
         <script>
-            function submitForm(selection, img1, img2) {
+            function submitForm(selection, aud1, aud2) {
                 var form = document.getElementById ("surveyForm");
                 var selectionInput = document.getElementById("selectionInput");
-                var img1Input = document.getElementById("aud1Input");
-                var img2Input = document.getElementById("aud2Input");
+                var aud1Input = document.getElementById("aud1Input");
+                var aud2Input = document.getElementById("aud2Input");
                 selectionInput.value = selection;
-                img1Input.value = aud1;
-                img2Input.value = aud2;
+                aud1Input.value = aud1;
+                aud2Input.value = aud2;
                 form.submit();
             }
+
+            const audio1 = document.getElementById('audio-1');
+            const audio2 = document.getElementById('audio-2');
+        
+            const playAudio1Button = document.getElementById('play-audio-1');
+            const playAudio2Button = document.getElementById('play-audio-2');
+        
+            playAudio1Button.addEventListener('click', function() {
+              audio1.play();
+              playAudio1Button.disabled = true;
+            });
+        
+            playAudio2Button.addEventListener('click', function() {
+              audio2.play();
+              playAudio2Button.disabled = true;
+            });
+
         </script>
     </head>
 
@@ -56,24 +73,8 @@
             <input type="hidden" id="aud2Input" name="aud2">
         </form>
 
-        <script>
-            const audio1 = document.getElementById('audio-1');
-            const audio2 = document.getElementById('audio-2');
-        
-            const playAudio1Button = document.getElementById('play-audio-1');
-            const playAudio2Button = document.getElementById('play-audio-2');
-        
-            playAudio1Button.addEventListener('click', function() {
-              audio1.play();
-              playAudio1Button.disabled = true;
-            });
-        
-            playAudio2Button.addEventListener('click', function() {
-              audio2.play();
-              playAudio2Button.disabled = true;
-            });
-          </script>
-
     </body>
 </html>
+
+{%endblock%}
 

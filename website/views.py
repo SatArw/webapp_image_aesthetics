@@ -25,9 +25,9 @@ cur.execute('SELECT * FROM aspect_images')
 imgs = cur.fetchall()
 total_imgs_aspect = len(imgs)
 
-# cur.execute('SELECT * from audios')
-# auds = cur.fetchall()
-# total_auds = len(auds)
+cur.execute('SELECT * from audios')
+auds = cur.fetchall()
+total_auds = len(auds)
 
 
 @views.route('/', methods=['GET', 'POST'])
@@ -148,56 +148,57 @@ def aspect_submit():
 ########################
 #Routes for audio survey
 
-# @views.route('/audio_select')
-# @login_required
-# def audio_select():
-#     sess = sess_idntfr  # store the value of session_identifier from home
-#     cursorObject = conn.cursor()
-#     cursorObject.execute(
-#         "SELECT aud1, aud2 FROM audio_data WHERE session_id = '{}' ".format(sess))  # select audios from the database with same session_id so that they can be removed.
-#     res = cursorObject.fetchall()
+@views.route('/audio_select')
+@login_required
+def audio_select():
+    sess = sess_idntfr  # store the value of session_identifier from home
+    cursorObject = conn.cursor()
+    cursorObject.execute(
+        "SELECT aud1, aud2 FROM audio_data WHERE session_id = '{}' ".format(sess))  # select audios from the database with same session_id so that they can be removed.
+    res = cursorObject.fetchall()
+    sess_limit = True if len(res) == 40 else False
+    # make a list of all such rows and delete them
+    lis = list(range(1, total_auds+1))
+    
+    for x in res:
+        lis.remove(x[0])
+        lis.remove(x[1])
 
-#     # make a list of all such rows and delete them
-#     lis = list(range(1, total_auds+1))
-#     for x in res:
-#         lis.remove(x[0])
-#         lis.remove(x[1])
+    # if all audios are done, render the home page
+    if len(lis) == 0 or sess_limit:
+        return redirect(url_for('views.thank_you'))
 
-#     # if all audios are done, render the home page
-#     if len(lis) == 0:
-#         return redirect(url_for('views.thank_you'))
+    # make random choices and select those audios
+    i1 = random.choice(lis)
+    lis.remove(i1)
+    i2 = random.choice(lis)
+    cursorObject.execute(
+        "SELECT aud_id,link FROM audios WHERE aud_id={}".format(i1))
+    a1 = cursorObject.fetchone()
+    cursorObject.execute(
+        "SELECT aud_id,link FROM audios WHERE aud_id={}".format(i2))
+    a2 = cursorObject.fetchone()
+    global start_time
+    start_time = time.time()
+    return render_template('audio_survey.html', aud1=a1, aud2=a2, user=current_user)
 
-#     # make random choices and select those audios
-#     i1 = random.choice(lis)
-#     lis.remove(i1)
-#     i2 = random.choice(lis)
-#     cursorObject.execute(
-#         "SELECT aud_id,link FROM audios WHERE aud_id={}".format(i1))
-#     a1 = cursorObject.fetchone()
-#     cursorObject.execute(
-#         "SELECT aud_id,link FROM audios WHERE aud_id={}".format(i2))
-#     a2 = cursorObject.fetchone()
-#     global start_time
-#     start_time = time.time()
-#     return render_template('audio_survey.html', aud1=a1, aud2=a2, user=current_user)
-
-# @ views.route('/audio_submit', methods=['POST'])
-# @ login_required
-# def audio_submit():
-#     # get the user's selection and the two audios that were shown
-#     user_id = request.form['user_id']
-#     selection = request.form['selection']
-#     aud1 = request.form['aud1']
-#     aud2 = request.form['aud2']
-#     sess_id = request.form['sess_id']
-#     time_taken_ = time.time()-start_time
-#     # insert the data into the database
-#     cur = conn.cursor()
-#     cur.execute("INSERT INTO audio_data (user_id, session_id, aud1, aud2, selection, time_taken) VALUES (?, ?, ?, ?, ?,?)",
-#                 (user_id, sess_idntfr, aud1, aud2, selection,time_taken_))
-#     conn.commit()
-#     # redirect to the survey page to show the next pair of audios
-#     return redirect(url_for('views.audio_select'))
+@ views.route('/audio_submit', methods=['POST'])
+@ login_required
+def audio_submit():
+    # get the user's selection and the two audios that were shown
+    user_id = request.form['user_id']
+    selection = request.form['selection']
+    aud1 = request.form['aud1']
+    aud2 = request.form['aud2']
+    sess_id = request.form['sess_id']
+    time_taken_ = time.time()-start_time
+    # insert the data into the database
+    cur = conn.cursor()
+    cur.execute("INSERT INTO audio_data (user_id, session_id, aud1, aud2, selection, time_taken) VALUES (?, ?, ?, ?, ?,?)",
+                (user_id, sess_idntfr, aud1, aud2, selection,time_taken_))
+    conn.commit()
+    # redirect to the survey page to show the next pair of audios
+    return redirect(url_for('views.audio_select'))
 
 
 ###########################

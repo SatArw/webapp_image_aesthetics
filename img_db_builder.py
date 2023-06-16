@@ -22,8 +22,6 @@ cloudinary.config(
 # Specify the folder you want to scrape
 folder_name = 'aspect_ratio'
 
-
-
 # Set up pagination for the API request
 next_cursor = None
 page_size = 100

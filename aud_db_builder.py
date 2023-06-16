@@ -1,61 +1,39 @@
 import cloudinary
-import cloudinary.api
 import cloudinary.uploader
+import cloudinary.api
 
-# Set up your Cloudinary credentials
 cloudinary.config(
   cloud_name = 'drqnkfexf',
   api_key = '127479953536276',
   api_secret = 'w-r7AP5-XtCykP61KxvWKfNr7y8'
 )
-# The Cloudinary folder to list files from
+
 folder_name = "audios"
+max_results = 100
 
-# Initialize empty lists for the URLs and durations
-urls = []
-durations = []
+# Initialize the cursor to None
+next_cursor = None
 
-# Use the Cloudinary API to list all files in the folder
-try:
-    response = cloudinary.api.resources(type='upload', prefix=folder_name, max_results=500)
-    files = response['resources']
-    for file in files:
-        # Check if the file is an audio file
-        if file["resource_type"] == "video":
-            continue
-        else:
-            # Retrieve the URL of the audio file
-            url = cloudinary.utils.cloudinary_url(file["public_id"], resource_type=file["resource_type"])[0]
+# Loop through all pages of results
+while True:
+    # Get a page of results
+    print("loop1")
+    response = cloudinary.api.resources(type="upload", prefix=folder_name, max_results=max_results, next_cursor=next_cursor)
 
-            # Retrieve the duration of the audio file
-            duration = file["duration"]
-
-            # Append the URL and duration to the respective lists
-            urls.append(url)
-            durations.append(duration)
-
-    # Check if there are more files to list
-    while 'next_cursor' in response:
-        response = cloudinary.api.resources(type='upload', prefix=folder_name, max_results=500, next_cursor=response['next_cursor'])
-        files = response['resources']
-        for file in files:
-            # Check if the file is an audio file
-            if file["resource_type"] == "video":
-                continue
-            else:
-                # Retrieve the URL of the audio file
-                url = cloudinary.utils.cloudinary_url(file["public_id"], resource_type=file["resource_type"])[0]
-
-                # Retrieve the duration of the audio file
-                duration = file["duration"]
-
-                # Append the URL and duration to the respective lists
-                urls.append(url)
-                durations.append(duration)
-
-except cloudinary.api.Error as e:
-    print("Cloudinary API Error:", e.message)
-
-# Print the list of URLs and durations
-print("URLs: " + str(urls))
-print("Durations: " + str(durations))
+    # Loop through each file on this page and get its public ID and duration
+    for item in response["resources"]:
+        print("loop2")
+        public_id = item["public_id"]
+        url = cloudinary.utils.cloudinary_url(public_id, resource_type="raw")
+        duration = item["duration"]
+        
+        print("File: " + public_id)
+        print("URL: " + url[0])
+        print("Duration: " + str(duration) + " seconds")
+    
+    # If there are no more pages, break out of the loop
+    if "next_cursor" not in response:
+        break
+    
+    # Otherwise, set the cursor to the next page of results
+    next_cursor = response["next_cursor"]
