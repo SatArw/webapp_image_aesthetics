@@ -1,11 +1,15 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
+  %}
 <br>
 <h1 align="center">Welcome</h1>
 <br>
 <br>
 <br>
+
+
+
 <div style="border: thin solid black">
+
 <p>
   <center>
     <h5>Hello there! Please take these surveys.You will be presented a set of pair of images and you need to choose one
@@ -17,22 +21,19 @@
 <br>
 <br>
 
-<form action="/select">
-  <br />
+<form action="/select" method="get">
   <div align="center">
-    <button type="submit" class="btn btn-primary">Start Survey</button>
+      <button type="submit" class="btn btn-primary" name="survey" value="temple">Start Temple Survey</button>
   </div>
 </form>
-<form action="/aspect_select">
-  <br>
+<form action="/select" method="get">
   <div align="center">
-    <button type="submit" class="btn btn-primary">Start Aspect ratio Survey</button>
+      <button type="submit" class="btn btn-primary" name="survey" value="aspect">Start Aspect Ratio Survey</button>
   </div>
 </form>
-<form action="/audio_select">
-  <br>
+<form action="/audio_select" method="get">
   <div align="center">
-    <button type="submit" class="btn btn-primary">Start Audio ratio Survey</button>
+      <button type="submit" class="btn btn-primary" name="survey" value="audio">Start Audio Ratio Survey</button>
   </div>
 </form>
 <br>

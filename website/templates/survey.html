@@ -6,14 +6,16 @@
 <head>
     <title>Image Survey</title>
     <script>
-        function submitForm(selection, img1, img2) {
+        function submitForm(selection, img1, img2, survey_type) {
             var form = document.getElementById("surveyForm");
             var selectionInput = document.getElementById("selectionInput");
             var img1Input = document.getElementById("img1Input");
             var img2Input = document.getElementById("img2Input");
+            // var surveyInput = document.getElementById("surveyInput")
             selectionInput.value = selection;
             img1Input.value = img1;
             img2Input.value = img2;
+            // surveyInput.value = survey_type;
             form.submit();
         }
 
@@ -74,6 +76,7 @@
     <form id="surveyForm" method="post" action="/submit">
         <input type="hidden" name="user_id" value="{{ user }}">
         <input type="hidden" name="sess_id" value="{{ sess_id }}">
+        <input type="hidden" name="survey" value="{{ survey_type }}">
         <div id="img_container" align="center" class="flex-container">
             <div id="imgs1" style="border: thin solid black" class = "flex2">
                 <img src="{{ img1[1] }}" width="400" height="400" 

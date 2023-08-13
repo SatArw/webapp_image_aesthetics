@@ -43,9 +43,21 @@ def home():
 @login_required
 def select():
     sess = sess_idntfr  # store the value of session_identifier from home
+
+    survey_type = session.get('survey_type')
+    if survey_type is None:
+        survey_type = request.args.get('survey')
+        session['survey_type'] = survey_type    
+
+    if survey_type == 'temple':
+        table_name = 'data'
+    elif survey_type == 'aspect':
+        table_name = 'aspect_data'
+    else:
+        return redirect(url_for('views.home'))
+    
     cursorObject = conn.cursor()
-    cursorObject.execute(
-        "SELECT img1, img2 FROM data WHERE session_id = '{}' ".format(sess))  # select images from the database with same session_id so that they can be removed.
+    cursorObject.execute(f"SELECT img1, img2 FROM {table_name} WHERE session_id ='{sess}' ")  # select images from the database with same session_id so that they can be removed.
     res = cursorObject.fetchall()
     sess_limit = True if len(res) == 40 else False
     # make a list of all such rows and delete them
@@ -56,21 +68,26 @@ def select():
 
     # if all images are done, render the home page
     if len(lis) == 0 or sess_limit:
+        session.pop('survey_type')
         return redirect(url_for('views.thank_you'))
+
+
+    if table_name == 'data': table_name = 'images'
+    if table_name == 'aspect_data': table_name = 'aspect_images'
 
     # make random choices and select those images
     i1 = random.choice(lis)
     lis.remove(i1)
     i2 = random.choice(lis)
     cursorObject.execute(
-        "SELECT img_id,link FROM images WHERE img_id={}".format(i1))
+        f"SELECT img_id,link FROM {table_name} WHERE img_id={i1}")
     image1 = cursorObject.fetchone()
     cursorObject.execute(
-        "SELECT img_id,link FROM images WHERE img_id={}".format(i2))
+        f"SELECT img_id,link FROM {table_name} WHERE img_id={i2}")
     image2 = cursorObject.fetchone()
     global start_time
     start_time = time.time()
-    return render_template('survey.html', img1=image1, img2=image2, user=current_user)
+    return render_template('survey.html', img1=image1, img2=image2, user=current_user,survey_type=survey_type)
 
 @ views.route('/submit', methods=['POST'])
 @ login_required
@@ -82,68 +99,23 @@ def submit():
     img2 = request.form['img2']
     sess_id = request.form['sess_id']
     time_taken_ = time.time()-start_time
-    # insert the data into the database
-    cur = conn.cursor()
-    cur.execute("INSERT INTO data (user_id, session_id, img1, img2, selection,time_taken) VALUES (?, ?, ?, ?, ?,?)",
-                (user_id, sess_idntfr, img1, img2, selection,time_taken_))
-    conn.commit()
-    # redirect to the home page to show the next pair of images
-    return redirect(url_for('views.select'))
 
-################################
-# Routes for aspect ratio survey
+    survey_type = request.form['survey']  # Get the survey type from the submitted form data
 
-@views.route('/aspect_select')
-@login_required
-def aspect_select():
-    sess = sess_idntfr  # store the value of session_identifier from home
-    cursorObject = conn.cursor()
-    cursorObject.execute(
-        "SELECT img1, img2 FROM aspect_data WHERE session_id = '{}' ".format(sess))  # select images from the database with same session_id so that they can be removed.
-    res = cursorObject.fetchall()
-    sess_limit = True if len(res) == 40 else False
-    # make a list of all such rows and delete them
-    lis = list(range(1, total_imgs_aspect+1))
+    if survey_type == 'temple':
+        table_name = 'data'
+    elif survey_type == 'aspect':
+        table_name = 'aspect_data'
+    else:
+        return redirect(url_for('views.home',survey_type=survey_type))
     
-    for x in res:
-        lis.remove(x[0])
-        lis.remove(x[1])
-
-    # if all images are done, render the home page
-    if len(lis) == 0 or sess_limit:
-        return redirect(url_for('views.thank_you'))
-
-    # make random choices and select those images
-    i1 = random.choice(lis)
-    lis.remove(i1)
-    i2 = random.choice(lis)
-    cursorObject.execute(
-        "SELECT img_id,link FROM aspect_images WHERE img_id={}".format(i1))
-    image1 = cursorObject.fetchone()
-    cursorObject.execute(
-        "SELECT img_id,link FROM aspect_images WHERE img_id={}".format(i2))
-    image2 = cursorObject.fetchone()
-    global start_time
-    start_time = time.time()
-    return render_template('aspect_survey.html', img1=image1, img2=image2, user=current_user)
-
-@ views.route('/aspect_submit', methods=['POST'])
-@ login_required
-def aspect_submit():
-    # get the user's selection and the two images that were shown
-    user_id = request.form['user_id']
-    selection = request.form['selection']
-    img1 = request.form['img1']
-    img2 = request.form['img2']
-    sess_id = request.form['sess_id']
-    time_taken_ = time.time()-start_time
     # insert the data into the database
     cur = conn.cursor()
-    cur.execute("INSERT INTO aspect_data (user_id, session_id, img1, img2, selection,time_taken) VALUES (?, ?, ?, ?, ?,?)",
+    cur.execute(f"INSERT INTO {table_name} (user_id, session_id, img1, img2, selection,time_taken) VALUES (?, ?, ?, ?, ?,?)",
                 (user_id, sess_idntfr, img1, img2, selection,time_taken_))
     conn.commit()
     # redirect to the home page to show the next pair of images
-    return redirect(url_for('views.aspect_select'))
+    return redirect(url_for('views.select',survey_type=survey_type))
 
 ########################
 #Routes for audio survey
