@@ -172,9 +172,6 @@ def audio_submit():
     # redirect to the survey page to show the next pair of audios
     return redirect(url_for('views.audio_select'))
 
-
-###########################
-# Utility routes
 @ views.route('/thank_you')
 @login_required
 def thank_you():
