@@ -11,11 +11,9 @@
             var selectionInput = document.getElementById("selectionInput");
             var img1Input = document.getElementById("img1Input");
             var img2Input = document.getElementById("img2Input");
-            // var surveyInput = document.getElementById("surveyInput")
             selectionInput.value = selection;
             img1Input.value = img1;
             img2Input.value = img2;
-            // surveyInput.value = survey_type;
             form.submit();
         }
 
@@ -50,7 +48,7 @@
 <body>
     <div id="info" style="margin: 0 auto;">
         <h1>
-            <center>Temple Styles Survey</center>
+            <center>Visual Survey</center>
         </h1>
         <p>
             <center><b>Please go through these images and choose the one that you like, click on submit to move on to
@@ -75,7 +73,7 @@
     </div>
     <form id="surveyForm" method="post" action="/submit">
         <input type="hidden" name="user_id" value="{{ user }}">
-        <input type="hidden" name="sess_id" value="{{ sess_id }}">
+        <!-- <input type="hidden" name="sess_id" value="{{ sess_id }}"> -->
         <input type="hidden" name="survey" value="{{ survey_type }}">
         <div id="img_container" align="center" class="flex-container">
             <div id="imgs1" style="border: thin solid black" class = "flex2">

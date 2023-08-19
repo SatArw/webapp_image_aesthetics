@@ -11,6 +11,7 @@ import string
 
 time_between_pairs = 20
 time_for_each_pair = 5
+max_pairs_in_session = 20
 views = Blueprint('views', __name__)
 
 conn = sqlite3.connect(
@@ -19,11 +20,11 @@ conn = sqlite3.connect(
 cur = conn.cursor()
 cur.execute('SELECT * FROM images')
 imgs = cur.fetchall()
-total_imgs = len(imgs)
+
 
 cur.execute('SELECT * FROM aspect_images')
 imgs = cur.fetchall()
-total_imgs_aspect = len(imgs)
+total_imgs = len(imgs)
 
 cur.execute('SELECT * from audios')
 auds = cur.fetchall()
@@ -45,10 +46,11 @@ def select():
     sess = sess_idntfr  # store the value of session_identifier from home
 
     survey_type = session.get('survey_type')
-    if survey_type is None:
-        survey_type = request.args.get('survey')
+    if survey_type is None: #if survey_type is none, it means select is being called from home and we need to request it from the form.
+        survey_type = request.args.get('survey') #if survey_type is already stored in the session, then no need to request
         session['survey_type'] = survey_type    
 
+    #setting the right table to insert into
     if survey_type == 'temple':
         table_name = 'data'
     elif survey_type == 'aspect':
@@ -57,11 +59,17 @@ def select():
         return redirect(url_for('views.home'))
     
     cursorObject = conn.cursor()
-    cursorObject.execute(f"SELECT img1, img2 FROM {table_name} WHERE session_id ='{sess}' ")  # select images from the database with same session_id so that they can be removed.
+    try:
+        cursorObject.execute(f"SELECT img1, img2 FROM {table_name} WHERE session_id ='{sess}' ")  # select images from the database with same session_id so that they can be removed.
+    except:
+        flash('Something went wrong with the database! Please re-take the survey',category='error')
+        redirect(url_for('views.home'))
     res = cursorObject.fetchall()
-    sess_limit = True if len(res) == 40 else False
+    sess_limit = True if len(res) == max_pairs_in_session else False
     # make a list of all such rows and delete them
-    lis = list(range(1, total_imgs+1))
+    lis = list(range(1, total_imgs+1)
+               )
+    
     for x in res:
         lis.remove(x[0])
         lis.remove(x[1])
@@ -71,7 +79,6 @@ def select():
         session.pop('survey_type')
         return redirect(url_for('views.thank_you'))
 
-
     if table_name == 'data': table_name = 'images'
     if table_name == 'aspect_data': table_name = 'aspect_images'
 
@@ -79,11 +86,19 @@ def select():
     i1 = random.choice(lis)
     lis.remove(i1)
     i2 = random.choice(lis)
-    cursorObject.execute(
+    try:
+        cursorObject.execute(
         f"SELECT img_id,link FROM {table_name} WHERE img_id={i1}")
+    except:
+        flash('Something went wrong with the database! Please re-take the survey',category='error')
+        redirect(url_for('views.home'))
     image1 = cursorObject.fetchone()
-    cursorObject.execute(
+    try:
+        cursorObject.execute(
         f"SELECT img_id,link FROM {table_name} WHERE img_id={i2}")
+    except:
+        flash('Something went wrong with the database! Please re-take the survey',category='error')
+        redirect(url_for('views.home'))   
     image2 = cursorObject.fetchone()
     global start_time
     start_time = time.time()
@@ -97,8 +112,11 @@ def submit():
     selection = request.form['selection']
     img1 = request.form['img1']
     img2 = request.form['img2']
-    sess_id = request.form['sess_id']
-    time_taken_ = time.time()-start_time
+    try:
+        time_taken_ = time.time()-start_time
+    except:
+        flash('Something went wrong with the timer! Please re-take the survey',category='error')
+        return redirect(url_for('views.home'))
 
     survey_type = request.form['survey']  # Get the survey type from the submitted form data
 
@@ -107,12 +125,17 @@ def submit():
     elif survey_type == 'aspect':
         table_name = 'aspect_data'
     else:
+        flash('Something went wrong with the database! Please re-take the survey',category='error')
         return redirect(url_for('views.home',survey_type=survey_type))
     
     # insert the data into the database
     cur = conn.cursor()
-    cur.execute(f"INSERT INTO {table_name} (user_id, session_id, img1, img2, selection,time_taken) VALUES (?, ?, ?, ?, ?,?)",
+    try:
+        cur.execute(f"INSERT INTO {table_name} (user_id, session_id, img1, img2, selection,time_taken) VALUES (?, ?, ?, ?, ?,?)",
                 (user_id, sess_idntfr, img1, img2, selection,time_taken_))
+    except:
+        flash('Something went wrong with the database! Please re-take the survey',category='error')
+        redirect(url_for('views.home'))
     conn.commit()
     # redirect to the home page to show the next pair of images
     return redirect(url_for('views.select',survey_type=survey_type))
@@ -128,7 +151,7 @@ def audio_select():
     cursorObject.execute(
         "SELECT aud1, aud2 FROM audio_data WHERE session_id = '{}' ".format(sess))  # select audios from the database with same session_id so that they can be removed.
     res = cursorObject.fetchall()
-    sess_limit = True if len(res) == 40 else False
+    sess_limit = True if len(res) == max_pairs_in_session else False
     # make a list of all such rows and delete them
     lis = list(range(1, total_auds+1))
     
