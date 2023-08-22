@@ -43,7 +43,11 @@ def home():
 @views.route('/select')
 @login_required
 def select():
-    sess = sess_idntfr  # store the value of session_identifier from home
+    try:
+        sess = sess_idntfr  # store the value of session_identifier from home
+    except:
+        flash('Something went wrong with the session! Please try again',category='error')
+        render_template(url_for('views.home'))
 
     survey_type = session.get('survey_type')
     if survey_type is None: #if survey_type is none, it means select is being called from home and we need to request it from the form.
