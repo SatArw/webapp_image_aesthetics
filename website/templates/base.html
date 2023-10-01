@@ -74,6 +74,18 @@
       integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
+    <script>
+            // Get a reference to the button element by its ID
+      var myButton = document.getElementById("logout");
+
+      // Define a function to be executed when the button is clicked
+      function buttonClickHandler() {
+        alert("Please wait for sometime before you login again!");
+      }
+
+      // Add a click event listener to the button, binding it to the function
+      myButton.onclick = buttonClickHandler;
+    </script>
 
   </body>
 </html>

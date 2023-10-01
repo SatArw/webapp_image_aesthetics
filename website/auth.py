@@ -6,6 +6,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 import random
 import string
 import sqlite3
+import time 
 
 auth = Blueprint('auth', __name__)
 
@@ -36,7 +37,11 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+    # flash('Please wait for sometime before you login again', category='failure')
     logout_user()
+    login_wait = 10
+    time.sleep(login_wait)
+    
     return redirect(url_for('auth.login'))
 
 

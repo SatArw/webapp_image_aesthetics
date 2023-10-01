@@ -66,6 +66,30 @@
                 document.getElementById("countdown").innerHTML = count;
             }, 1000);
         </script>
+
+        <!-- <script>
+            // Get references to both image buttons by their IDs
+            var image1 = document.getElementById("img_one");
+            var image2 = document.getElementById("img_two");
+
+            var img1Value =     {{ img1[0]}}
+            // Define a function to be executed when either image button is clicked
+            function imageClickHandler(imageElement) {
+            // Hide the clicked image by changing its CSS display property to "none"
+            imageElement.style.display = "none";
+            }
+
+            // Add click event listeners to both image buttons, binding them to the function
+            image1.onclick = function() {
+            imageClickHandler(image1);
+            submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}');
+            };
+
+            image2.onclick = function() {
+            imageClickHandler(image2);
+            };  
+        </script> -->
+        
         <!-- <h5><center>Countdown Timer</center></h5> -->
         <h3>
             <center><span id="countdown">5</span></center>
@@ -77,11 +101,11 @@
         <input type="hidden" name="survey" value="{{ survey_type }}">
         <div id="img_container" align="center" class="flex-container">
             <div id="imgs1" style="border: thin solid black" class = "flex2">
-                <img src="{{ img1[1] }}" 
+                <img src="{{ img1[1] }}" id = "img_one" 
                     onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
             </div>
             <div id="imgs2" style="border: thin solid black" class = "flex2">
-                <img src="{{ img2[1] }}" 
+                <img src="{{ img2[1] }}" id="img_two"
                     onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
             </div>
         </div>
