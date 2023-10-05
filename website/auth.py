@@ -39,7 +39,7 @@ def login():
 def logout():
     # flash('Please wait for sometime before you login again', category='failure')
     logout_user()
-    login_wait = 10
+    login_wait = 3
     time.sleep(login_wait)
     
     return redirect(url_for('auth.login'))
