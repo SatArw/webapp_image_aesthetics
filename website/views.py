@@ -16,6 +16,7 @@ sql_query_aspect_data = "INSERT INTO aspect_data(user_id, session_id, img1, img2
 sql_query_data = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
 small_query_aspect_data = ""
 small_query_data = ""
+update_no = 0
 
 image_selection = []
 views = Blueprint('views', __name__)
@@ -50,7 +51,7 @@ def home():
 @views.route('/select')
 @login_required
 def select():
-    global sql_query_aspect_data, sql_query_data, small_query_aspect_data, small_query_data, image_selection
+    global sql_query_aspect_data, sql_query_data, small_query_aspect_data, small_query_data, image_selection, update_no
     try:
         sess = sess_idntfr  # store the value of session_identifier from home
     except:
@@ -79,6 +80,12 @@ def select():
         redirect(url_for('views.home'))
     res = cursorObject.fetchall()
     '''
+    if update_no == 0 and len(image_selection) != 0:
+        if table_name == 'data':
+            small_query_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(current_user), str(sess_idntfr), image_selection[-1][0], image_selection[-1][1], -1, 5)
+        if table_name == 'aspect_data':
+            small_query_aspect_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(current_user), str(sess_idntfr), image_selection[-1][0], image_selection[-1][1], -1, 5)
+
     sess_limit = True if len(image_selection) == max_pairs_in_session else False
     # make a list of all such rows and delete them
     lis = list(range(1, total_imgs+1))
@@ -115,6 +122,7 @@ def select():
         sql_query_data = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
         small_query_data = ""
         small_query_aspect_data = ""
+        image_selection = []
         session.pop('survey_type')
         return redirect(url_for('views.thank_you'))
     if table_name == 'data':
@@ -146,13 +154,18 @@ def select():
     image2 = cursorObject.fetchone()
     global start_time
     start_time = time.time()
+    imgs_chosen = []
+    imgs_chosen.append(i1)
+    imgs_chosen.append(i2)
+    image_selection.append(imgs_chosen)
+    update_no = 0
     return render_template('survey.html', img1=image1, img2=image2, user=current_user,survey_type=survey_type)
 
 @ views.route('/submit', methods=['POST'])
 @ login_required
 def submit():
     # get the user's selection and the two images that were shown
-    global small_query_data, image_selection, small_query_aspect_data
+    global small_query_data, image_selection, small_query_aspect_data, update_no
     user_id = request.form['user_id']
     selection = request.form['selection']
     img1 = request.form['img1']
@@ -167,7 +180,7 @@ def submit():
 
     if survey_type == 'temple':
         table_name = 'data'
-        small_query_data = "(%s, %s, %s, %s, %s, %s)"%(user_id, sess_idntfr, img1, img2, selection,time_taken_) 
+        small_query_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(user_id, sess_idntfr, img1, img2, selection,time_taken_) 
     elif survey_type == 'aspect':
         table_name = 'aspect_data'
         small_query_aspect_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(user_id), str(sess_idntfr), img1, img2, selection,time_taken_) 
@@ -176,6 +189,7 @@ def submit():
         flash('Something went wrong with the database! Please re-take the survey',category='error')
         return redirect(url_for('views.home',survey_type=survey_type))
     '''
+    update_no = 1
     time.sleep(time_between_pairs)  
     # insert the data into the database
     #cur = conn.cursor()
@@ -190,10 +204,7 @@ def submit():
     conn.commit()
     '''
     # redirect to the home page to show the next pair of images
-    imgs_chosen = []
-    imgs_chosen.append(img1)
-    imgs_chosen.append(img2)
-    image_selection.append(imgs_chosen)
+    
     return redirect(url_for('views.select',survey_type=survey_type))
 
 ########################
