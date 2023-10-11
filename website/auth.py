@@ -6,28 +6,51 @@ from flask_login import login_user, login_required, logout_user, current_user
 import random
 import string
 import sqlite3
-import time 
+import time, datetime
 
+login_allowance_time = 10 #in seconds
 auth = Blueprint('auth', __name__)
 
 conn = sqlite3.connect(
     "img_db", check_same_thread=False)
 
+conn_user = sqlite3.connect(
+    "./instance/database.db", check_same_thread=False)
 
+eml = ""
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    global eml
     if request.method == 'POST':
         email = request.form.get('email')
+        eml = email
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
         if user:
-            if check_password_hash(user.password, password):
+            cursor_user = conn_user.cursor()
+            slct_string = f"SELECT * FROM sessions WHERE email = '{email}'"
+            cursor_user.execute(slct_string)
+            row = cursor_user.fetchone()
+            if row is not None:
+                login_cond = (datetime.datetime.now() - datetime.datetime.strptime(row[2],"%Y-%m-%d %H:%M:%S.%f")).total_seconds() >= login_allowance_time
+            else:
+                login_cond = 1
+            if check_password_hash(user.password, password) and login_cond: #check last logout of the user
+                login_time = str(datetime.datetime.now())
+                if row is not None:
+                    cursor_user.execute(f"UPDATE sessions SET last_login = '{login_time}' WHERE email = '{email}'")
+                    conn_user.commit()
+                else:
+                    cursor_user.execute(f"INSERT INTO sessions (email, last_login, last_logout) VALUES (?, ?, ?)",(email, login_time, login_time))
+                    conn_user.commit()
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
-
                 return redirect(url_for('views.home'))
             else:
-                flash('Incorrect password, try again.', category='error')
+                if not login_cond:
+                    flash(f'Please wait for {login_allowance_time}s before logging in', category='error')
+                else:
+                    flash('Incorrect password, try again.', category='error')
         else:
             flash('Email does not exist.', category='error')
 
@@ -38,8 +61,13 @@ def login():
 @login_required
 def logout():
     # flash('Please wait for sometime before you login again', category='failure')
+    global eml
+    cursor_user = conn_user.cursor()
+    logout_time = str(datetime.datetime.now())
+    cursor_user.execute(f"UPDATE sessions SET last_logout = '{logout_time}' WHERE email = '{eml}'")
+    conn_user.commit()
     logout_user()
-    login_wait = 3
+    login_wait = 0
     time.sleep(login_wait)
     
     return redirect(url_for('auth.login'))
