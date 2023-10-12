@@ -1,0 +1,18 @@
+#testing purposes only
+@views.route('/', methods=['GET', 'POST'])
+@login_required
+def home():
+    global global_time
+    global_time = time.time()
+    sess_idntfr = generate_unique_session_id()
+
+    session['sess_idntfr'] = sess_idntfr
+
+    return render_template("home.html", user=current_user, sid=sess_idntfr)
+
+def generate_unique_session_id():
+    while True:
+        sess_idntfr = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        if sess_idntfr not in session_ids:
+            session_ids.add(sess_idntfr)
+            return sess_idntfr
