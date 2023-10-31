@@ -8,17 +8,12 @@ import uuid
 import sqlite3
 import random
 import string
+import datetime
 
 time_between_pairs = 2
 time_for_each_pair = 5
 max_pairs_in_session = 20
-sql_query_aspect_data = "INSERT INTO aspect_data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
-sql_query_data = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
-small_query_aspect_data = ""
-small_query_data = ""
-update_no = 0
 
-image_selection = []
 views = Blueprint('views', __name__)
 
 conn = sqlite3.connect(
@@ -37,23 +32,31 @@ cur.execute('SELECT * from audios')
 auds = cur.fetchall()
 total_auds = len(auds)
 
-
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    global sess_idntfr, global_time
     global_time = time.time()
     sess_idntfr = ''.join(random.choices(string.ascii_uppercase +
-                                         string.digits, k=10))
+                                         string.digits, k=10))  # Generate a custom session ID
+    session["sql_query_aspect_data"] = "INSERT INTO aspect_data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
+    array = []
+    session["sql_query_data"] = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
+    session["small_query_aspect_data"] = ""
+    session["small_query_data"] = ""
+    session["update_no"] = 0
+    session["start_time"] = 0
+    session["image_selection"] = []
+    session["id"] = sess_idntfr
+    session["global_time"] = global_time
+    session["eml"] = ""
     return render_template("home.html", user=current_user, sid=sess_idntfr)
 
 
 @views.route('/select')
 @login_required
 def select():
-    global sql_query_aspect_data, sql_query_data, small_query_aspect_data, small_query_data, image_selection, update_no
     try:
-        sess = sess_idntfr  # store the value of session_identifier from home
+        sess = session["id"]  # store the value of session_identifier from home
     except:
         flash('Something went wrong with the session! Please try again',category='error')
         render_template(url_for('views.home'))
@@ -80,17 +83,17 @@ def select():
         redirect(url_for('views.home'))
     res = cursorObject.fetchall()
     '''
-    if update_no == 0 and len(image_selection) != 0:
+    if session["update_no"] == 0 and len(session["image_selection"]) != 0:
         if table_name == 'data':
-            small_query_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(current_user), str(sess_idntfr), image_selection[-1][0], image_selection[-1][1], -1, 5)
+            session["small_query_data"] = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(current_user), str(session["id"]), session["image_selection"][-1][0], session["image_selection"][-1][1], -1, 5)
         if table_name == 'aspect_data':
-            small_query_aspect_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(current_user), str(sess_idntfr), image_selection[-1][0], image_selection[-1][1], -1, 5)
+            session["small_query_aspect_data"] = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(current_user), str(session["id"]), session["image_selection"][-1][0], session["image_selection"][-1][1], -1, 5)
 
-    sess_limit = True if len(image_selection) == max_pairs_in_session else False
+    sess_limit = True if len(session["image_selection"]) == max_pairs_in_session else False
     # make a list of all such rows and delete them
     lis = list(range(1, total_imgs+1))
     
-    for x in image_selection:
+    for x in session["image_selection"]:
         #print(x[0],x[1])
         if x[0] in lis:
             lis.remove(x[0])
@@ -99,38 +102,38 @@ def select():
 
     # if all images are done, render the home page
     login_timeout = max_pairs_in_session * time_for_each_pair + 3
-    session_time = time.time()-global_time
+    session_time = time.time()-session["global_time"]
     if len(lis) == 0 or sess_limit or (session_time >= login_timeout):
         if table_name == 'data':
-            sql_query_data = sql_query_data + small_query_data
+            session["sql_query_data"] = session["sql_query_data"] + session["small_query_data"]
         if table_name == 'aspect_data':
-            sql_query_aspect_data = sql_query_aspect_data + small_query_aspect_data
+            session["sql_query_aspect_data"] = session["sql_query_aspect_data"] + session["small_query_aspect_data"]
         try:
-            if small_query_data != "":
-                cursorObject.execute(sql_query_data)
-            if small_query_aspect_data != "":
-                cursorObject.execute(sql_query_aspect_data)
+            if session["small_query_data"] != "":
+                cursorObject.execute(session["sql_query_data"])
+            if session["small_query_aspect_data"] != "":
+                cursorObject.execute(session["sql_query_aspect_data"])
             conn.commit()
         except:
             print("Sql aspect data\n")
-            print(sql_query_aspect_data)
+            print(session["sql_query_aspect_data"])
             print("Sql data\n")
-            print(sql_query_data)
+            print(session["sql_query_data"])
             flash('Something went wrong with the database! Please re-take the survey',category='error')
             redirect(url_for('views.home'))   
-        sql_query_aspect_data = "INSERT INTO aspect_data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
-        sql_query_data = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
-        small_query_data = ""
-        small_query_aspect_data = ""
-        image_selection = []
+        session["sql_query_aspect_data"] = "INSERT INTO aspect_data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
+        session["sql_query_data"] = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
+        session["small_query_data"] = ""
+        session["small_query_aspect_data"] = ""
+        session["image_selection"] = []
         session.pop('survey_type')
         return redirect(url_for('views.thank_you'))
     if table_name == 'data':
-        if small_query_data != "":
-            sql_query_data = sql_query_data + small_query_data + ","
+        if session["small_query_data"] != "":
+            session["sql_query_data"] = session["sql_query_data"] + session["small_query_data"] + ","
     if table_name == 'aspect_data':
-        if small_query_aspect_data != "": 
-            sql_query_aspect_data = sql_query_aspect_data + small_query_aspect_data + ","
+        if session["small_query_aspect_data"] != "": 
+            session["sql_query_aspect_data"] = session["sql_query_aspect_data"] + session["small_query_aspect_data"] + ","
     if table_name == 'data': table_name = 'images'
     if table_name == 'aspect_data': table_name = 'aspect_images'
 
@@ -152,26 +155,24 @@ def select():
         flash('Something went wrong with the database! Please re-take the survey',category='error')
         redirect(url_for('views.home'))   
     image2 = cursorObject.fetchone()
-    global start_time
-    start_time = time.time()
+    session["start_time"] = time.time()
     imgs_chosen = []
     imgs_chosen.append(i1)
     imgs_chosen.append(i2)
-    image_selection.append(imgs_chosen)
-    update_no = 0
+    session["image_selection"].append(imgs_chosen)
+    session["update_no"] = 0
     return render_template('survey.html', img1=image1, img2=image2, user=current_user,survey_type=survey_type)
 
 @ views.route('/submit', methods=['POST'])
 @ login_required
 def submit():
     # get the user's selection and the two images that were shown
-    global small_query_data, image_selection, small_query_aspect_data, update_no
     user_id = request.form['user_id']
     selection = request.form['selection']
     img1 = request.form['img1']
     img2 = request.form['img2']
     try:
-        time_taken_ = time.time()-start_time
+        time_taken_ = time.time()-session["start_time"]
     except:
         flash('Something went wrong with the timer! Please re-take the survey',category='error')
         return redirect(url_for('views.home'))
@@ -180,16 +181,16 @@ def submit():
 
     if survey_type == 'temple':
         table_name = 'data'
-        small_query_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(user_id, sess_idntfr, img1, img2, selection,time_taken_) 
+        session["small_query_data"] = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(user_id, session["id"], img1, img2, selection,time_taken_) 
     elif survey_type == 'aspect':
         table_name = 'aspect_data'
-        small_query_aspect_data = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(user_id), str(sess_idntfr), img1, img2, selection,time_taken_) 
+        session["small_query_aspect_data"] = "(\'%s\', \'%s\', %s, %s, %s, %s)"%(str(user_id), str(session["id"]), img1, img2, selection,time_taken_) 
     '''    
     else:
         flash('Something went wrong with the database! Please re-take the survey',category='error')
         return redirect(url_for('views.home',survey_type=survey_type))
     '''
-    update_no = 1
+    session["update_no"] = 1
     time.sleep(time_between_pairs)  
     # insert the data into the database
     #cur = conn.cursor()

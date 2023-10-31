@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -17,13 +17,12 @@ conn = sqlite3.connect(
 conn_user = sqlite3.connect(
     "./instance/database.db", check_same_thread=False)
 
-eml = ""
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    global eml
     if request.method == 'POST':
         email = request.form.get('email')
-        eml = email
+        #session["eml"] = email
         password = request.form.get('password')
         user = User.query.filter_by(email=email).first()
         if user:
@@ -36,15 +35,18 @@ def login():
             else:
                 login_cond = 1
             if check_password_hash(user.password, password) and login_cond: #check last logout of the user
+                
                 login_time = str(datetime.datetime.now())
                 if row is not None:
                     cursor_user.execute(f"UPDATE sessions SET last_login = '{login_time}' WHERE email = '{email}'")
                     conn_user.commit()
                 else:
-                    cursor_user.execute(f"INSERT INTO sessions (email, last_login, last_logout) VALUES (?, ?, ?)",(email, login_time, login_time))
+                    cursor_user.execute(f"INSERT INTO sessions (email, last_login, last_logout, user) VALUES (?, ?, ?, ?)",(email, login_time, login_time, str(-1)))
                     conn_user.commit()
                 flash('Logged in successfully!', category='success')
                 login_user(user, remember=True)
+                cursor_user.execute(f"UPDATE sessions SET user = '{current_user}' WHERE email = '{email}'")
+                conn_user.commit()
                 return redirect(url_for('views.home'))
             else:
                 if not login_cond:
@@ -61,10 +63,9 @@ def login():
 @login_required
 def logout():
     # flash('Please wait for sometime before you login again', category='failure')
-    global eml
     cursor_user = conn_user.cursor()
     logout_time = str(datetime.datetime.now())
-    cursor_user.execute(f"UPDATE sessions SET last_logout = '{logout_time}' WHERE email = '{eml}'")
+    cursor_user.execute(f"UPDATE sessions SET last_logout = '{logout_time}' WHERE user = '{current_user}'")
     conn_user.commit()
     logout_user()
     login_wait = 0
