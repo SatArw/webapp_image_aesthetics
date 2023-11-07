@@ -39,7 +39,6 @@ def home():
     sess_idntfr = ''.join(random.choices(string.ascii_uppercase +
                                          string.digits, k=10))  # Generate a custom session ID
     session["sql_query_aspect_data"] = "INSERT INTO aspect_data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
-    array = []
     session["sql_query_data"] = "INSERT INTO data(user_id, session_id, img1, img2, selection,time_taken) VALUES"
     session["small_query_aspect_data"] = ""
     session["small_query_data"] = ""
@@ -49,6 +48,14 @@ def home():
     session["id"] = sess_idntfr
     session["global_time"] = global_time
     session["eml"] = ""
+    cur.execute('SELECT distinct image_class FROM aspect_images')
+    image_classes =  cur.fetchall()
+    image_classes_unique = random.choice(image_classes)
+    cur.execute(f'SELECT img_id FROM aspect_images where image_class = {image_classes_unique[0]}')
+    links = cur.fetchall()
+    for i in range(0, len(links)):
+        links[i] = links[i][0]
+    session["links"] = links
     return render_template("home.html", user=current_user, sid=sess_idntfr)
 
 
@@ -91,8 +98,9 @@ def select():
 
     sess_limit = True if len(session["image_selection"]) == max_pairs_in_session else False
     # make a list of all such rows and delete them
-    lis = list(range(1, total_imgs+1))
-    
+    #lis = list(range(1, total_imgs+1))
+    #lis = list(range(1, total_imgs+1))
+    lis = session["links"].copy()
     for x in session["image_selection"]:
         #print(x[0],x[1])
         if x[0] in lis:
@@ -127,6 +135,7 @@ def select():
         session["small_query_aspect_data"] = ""
         session["image_selection"] = []
         session.pop('survey_type')
+        print(lis)
         return redirect(url_for('views.thank_you'))
     if table_name == 'data':
         if session["small_query_data"] != "":
