@@ -101,13 +101,14 @@ def select():
     #lis = list(range(1, total_imgs+1))
     #lis = list(range(1, total_imgs+1))
     lis = session["links"].copy()
+    '''
     for x in session["image_selection"]:
         #print(x[0],x[1])
         if x[0] in lis:
             lis.remove(x[0])
         if x[1] in lis:
             lis.remove(x[1])
-
+    '''
     # if all images are done, render the home page
     login_timeout = max_pairs_in_session * time_for_each_pair + 3
     session_time = time.time()-session["global_time"]

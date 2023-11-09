@@ -24,6 +24,8 @@ dist_img_class = random.choice(img_class)
 print(dist_img_class[0])
 cur.execute(f'SELECT img_id FROM aspect_images where image_class = {dist_img_class[0]}')
 imgs = cur.fetchall()
+img_2 = [[0, 1], [0, 2]]
+
 for i in range(0, len(imgs)):
     imgs[i] = imgs[i][0]
 print(imgs)
