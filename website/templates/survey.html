@@ -32,18 +32,10 @@
     <style>
             .flex-container {
                 display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                align-items: center;
-                }
+                align-items: flex-end;
+            }
             .flex2{
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: space-evenly;
-                padding: 2%;
-                align-items: center;
+                
             }
         
             img:hover {
@@ -107,12 +99,12 @@
         <input type="hidden" name="user_id" value="{{ user }}">
         <!-- <input type="hidden" name="sess_id" value="{{ sess_id }}"> -->
         <input type="hidden" name="survey" value="{{ survey_type }}">
-        <div id="img_container" align="center" class="flex-container">
-            <div id="imgs1" style="border: thin solid black" class = "flex2">
+        <div id="img_container" class="flex-container">
+            <div id="imgs1" class = "flex2">
                 <img src="{{ img1[1] }}" id = "img_one" 
                     onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
             </div>
-            <div id="imgs2" style="border: thin solid black" class = "flex2">
+            <div id="imgs2" class = "flex2">
                 <img src="{{ img2[1] }}" id="img_two"
                     onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
             </div>
