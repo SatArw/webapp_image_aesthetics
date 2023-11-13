@@ -1,122 +1,123 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-%}
-<!doctype html>
-<html>
-
-<head>
-    <title>Image Survey</title>
-    <script>
-        function submitForm(selection, img1, img2, survey_type) {
-            var form = document.getElementById("surveyForm");
-            var selectionInput = document.getElementById("selectionInput");
-            var img1Input = document.getElementById("img1Input");
-            var img2Input = document.getElementById("img2Input");
-            selectionInput.value = selection;
-            img1Input.value = img1;
-            img2Input.value = img2;
-            var image1 = document.getElementById("img_one");
-            var image2 = document.getElementById("img_two");
-            var div1 = document.getElementById("imgs1");
-            var div2 = document.getElementById("imgs2");
-            image1.style.display = "none";
-            div1.style.border = "none";
-            image2.style.display = "none";
-            div2.style.border = "none";
-            form.submit();
-        }
-
-        setTimeout(function () {
-            window.location.reload();
-        }, 5000);
-    </script>
-    <style>
-            .flex-container {
-                display: flex;
-                align-items: flex-end;
-            }
-            .flex2{
-                
-            }
-        
-            img:hover {
-                border: 2px solid red;
-            }
-    </style>
-
-</head>
-
-<body>
-    <div id="info" style="margin: 0 auto;">
-        <h1>
-            <center>Visual Survey</center>
-        </h1>
-        <p>
-            <center><b>Please go through these images and choose the one that you like, click on submit to move on to
-                    the next pair.</center>
-        </p>
-    </div>
-    <div id='countdown_timer'>
+    %}
+    <!doctype html>
+    <html>
+    
+    <head>
+        <title>Image Survey</title>
         <script>
-            var count = 5;
-            var timer = setInterval(function () {
-                count--;
-                if (count == 0) {
-                    clearInterval(timer);
-                }
-                document.getElementById("countdown").innerHTML = count;
-            }, 1000);
-        </script>
-
-        <!-- <script>
-            // Get references to both image buttons by their IDs
-            var image1 = document.getElementById("img_one");
-            var image2 = document.getElementById("img_two");
-
-            var img1Value =     {{ img1[0]}}
-            // Define a function to be executed when either image button is clicked
-            function imageClickHandler(imageElement) {
-            // Hide the clicked image by changing its CSS display property to "none"
-            imageElement.style.display = "none";
+            function submitForm(selection, img1, img2, survey_type) {
+                var form = document.getElementById("surveyForm");
+                var selectionInput = document.getElementById("selectionInput");
+                var img1Input = document.getElementById("img1Input");
+                var img2Input = document.getElementById("img2Input");
+                selectionInput.value = selection;
+                img1Input.value = img1;
+                img2Input.value = img2;
+                var image1 = document.getElementById("img_one");
+                var image2 = document.getElementById("img_two");
+                var div1 = document.getElementById("imgs1");
+                var div2 = document.getElementById("imgs2");
+                image1.style.display = "none";
+                div1.style.border = "none";
+                image2.style.display = "none";
+                div2.style.border = "none";
+                form.submit();
             }
-
-            // Add click event listeners to both image buttons, binding them to the function
-            image1.onclick = function() {
-            imageClickHandler(image1);
-            submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}');
-            };
-
-            image2.onclick = function() {
-            imageClickHandler(image2);
-            };  
-        </script> -->
-        
-        <!-- <h5><center>Countdown Timer</center></h5> -->
-        <h3>
-            <center><span id="countdown">5</span></center>
-        </h3>
-    </div>
-    <form id="surveyForm" method="post" action="/submit">
-        <input type="hidden" name="user_id" value="{{ user }}">
-        <!-- <input type="hidden" name="sess_id" value="{{ sess_id }}"> -->
-        <input type="hidden" name="survey" value="{{ survey_type }}">
-        <div id="img_container" class="flex-container">
-            <div id="imgs1" class = "flex2">
-                <img src="{{ img1[1] }}" id = "img_one" 
-                    onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
-            </div>
-            <div id="imgs2" class = "flex2">
-                <img src="{{ img2[1] }}" id="img_two"
-                    onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
-            </div>
+    
+            setTimeout(function () {
+                window.location.reload();
+            }, 5000);
+        </script>
+        <style>
+                .flex-container {
+                    display: flex;
+                    align-items: flex-end;
+                }
+                .flex2{
+                    max-width: '{{max_width_db}}'px;
+                    max-height: '{{max_height_db}}'px;
+                }
+    
+                img:hover {
+                    border: 2px solid red;
+                }
+        </style>
+    
+    </head>
+    
+    <body>
+        <div id="info" style="margin: 0 auto;">
+            <h1>
+                <center>Visual Survey</center>
+            </h1>
+            <p>
+                <center><b>Please go through these images and choose the one that you like, click on submit to move on to
+                        the next pair.</center>
+            </p>
         </div>
-        <input type="hidden" id="selectionInput" name="selection">
-        <input type="hidden" id="img1Input" name="img1">
-        <input type="hidden" id="img2Input" name="img2">
-    </form>
-</body>
-
-
-</html>
-
-
-{% endblock %}
+        <div id='countdown_timer'>
+            <script>
+                var count = 5;
+                var timer = setInterval(function () {
+                    count--;
+                    if (count == 0) {
+                        clearInterval(timer);
+                    }
+                    document.getElementById("countdown").innerHTML = count;
+                }, 1000);
+            </script>
+    
+            <!-- <script>
+                // Get references to both image buttons by their IDs
+                var image1 = document.getElementById("img_one");
+                var image2 = document.getElementById("img_two");
+    
+                var img1Value =     {{ img1[0]}}
+                // Define a function to be executed when either image button is clicked
+                function imageClickHandler(imageElement) {
+                // Hide the clicked image by changing its CSS display property to "none"
+                imageElement.style.display = "none";
+                }
+    
+                // Add click event listeners to both image buttons, binding them to the function
+                image1.onclick = function() {
+                imageClickHandler(image1);
+                submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}');
+                };
+    
+                image2.onclick = function() {
+                imageClickHandler(image2);
+                };
+            </script> -->
+    
+            <!-- <h5><center>Countdown Timer</center></h5> -->
+            <h3>
+                <center><span id="countdown">5</span></center>
+            </h3>
+        </div>
+        <form id="surveyForm" method="post" action="/submit">
+            <input type="hidden" name="user_id" value="{{ user }}">
+            <!-- <input type="hidden" name="sess_id" value="{{ sess_id }}"> -->
+            <input type="hidden" name="survey" value="{{ survey_type }}">
+            <div id="img_container" class="flex-container">
+                <div id="imgs1" class = "flex2">
+                    <img src="{{ img1[1] }}" id = "img_one"
+                        onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+                </div>
+                <div id="imgs2" class = "flex2">
+                    <img src="{{ img2[1] }}" id="img_two"
+                        onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+                </div>
+            </div>
+            <input type="hidden" id="selectionInput" name="selection">
+            <input type="hidden" id="img1Input" name="img1">
+            <input type="hidden" id="img2Input" name="img2">
+        </form>
+    </body>
+    
+    
+    </html>
+    
+    
+    {% endblock %}

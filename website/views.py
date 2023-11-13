@@ -16,10 +16,13 @@ max_pairs_in_session = 20
 
 views = Blueprint('views', __name__)
 
+
 conn = sqlite3.connect(
     "img_db", check_same_thread=False)
 
 cur = conn.cursor()
+
+'''
 cur.execute('SELECT * FROM images')
 imgs = cur.fetchall()
 
@@ -31,6 +34,14 @@ total_imgs = len(imgs)
 cur.execute('SELECT * from audios')
 auds = cur.fetchall()
 total_auds = len(auds)
+'''
+cur.execute(f'SELECT max(width) from aspect_images')
+max_width = cur.fetchall()
+max_width = max_width[0][0]
+
+cur.execute(f'SELECT max(height) from aspect_images')
+max_height = cur.fetchall()
+max_height = max_height[0][0]
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
@@ -171,7 +182,7 @@ def select():
     imgs_chosen.append(i2)
     session["image_selection"].append(imgs_chosen)
     session["update_no"] = 0
-    return render_template('survey.html', img1=image1, img2=image2, user=current_user,survey_type=survey_type)
+    return render_template('survey.html', img1=image1, img2=image2, user=current_user,survey_type=survey_type, max_width_db = max_width, max_height_db = max_height)
 
 @ views.route('/submit', methods=['POST'])
 @ login_required

@@ -25,8 +25,7 @@ print(dist_img_class[0])
 cur.execute(f'SELECT img_id FROM aspect_images where image_class = {dist_img_class[0]}')
 imgs = cur.fetchall()
 img_2 = [[0, 1], [0, 2]]
-
-for i in range(0, len(imgs)):
-    imgs[i] = imgs[i][0]
-print(imgs)
+cur.execute(f'SELECT max(width) from aspect_images')
+max_width = cur.fetchall()
+print(max_width[0][0])
 
