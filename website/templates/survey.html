@@ -1,74 +1,115 @@
 {% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
-    %}
-    <!doctype html>
-    <html>
-    
-    <head>
-        <title>Image Survey</title>
-        <script>
-            function submitForm(selection, img1, img2, survey_type) {
-                var form = document.getElementById("surveyForm");
-                var selectionInput = document.getElementById("selectionInput");
-                var img1Input = document.getElementById("img1Input");
-                var img2Input = document.getElementById("img2Input");
-                selectionInput.value = selection;
-                img1Input.value = img1;
-                img2Input.value = img2;
-                var image1 = document.getElementById("img_one");
-                var image2 = document.getElementById("img_two");
-                var div1 = document.getElementById("imgs1");
-                var div2 = document.getElementById("imgs2");
-                image1.style.display = "none";
-                div1.style.border = "none";
-                image2.style.display = "none";
-                div2.style.border = "none";
-                form.submit();
+%}
+<!doctype html>
+<html>
+
+<head>
+    <title>Image Survey</title>
+    <script>
+        function submitForm(selection, img1, img2, survey_type) {
+            var form = document.getElementById("surveyForm");
+            var selectionInput = document.getElementById("selectionInput");
+            var img1Input = document.getElementById("img1Input");
+            var img2Input = document.getElementById("img2Input");
+            selectionInput.value = selection;
+            img1Input.value = img1;
+            img2Input.value = img2;
+            var image1 = document.getElementById("img_one");
+            var image2 = document.getElementById("img_two");
+            var div1 = document.getElementById("imgs1");
+            var div2 = document.getElementById("imgs2");
+            image1.style.display = "none";
+            div1.style.border = "none";
+            image2.style.display = "none";
+            div2.style.border = "none";
+            form.submit();
+        }
+
+        setTimeout(function () {
+            window.location.reload();
+        }, 5000);
+
+    </script>
+
+    <style>
+        #portrait-alert {
+            display: none;
+            padding: 10px;
+            background-color: yellow;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .flex-container{
+            display: flex;
+            justify-content:safe;
+        }
+        .flex1 {
+            max-width: 100%;
+            max-height: auto;
+        }
+        .flex2 {
+            max-width: 100%;
+            height: auto;
+        }
+
+        img:hover {
+            border: 2px solid red;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="portrait-alert">Phone in potrait mode, please switch to landscape mode and zoom out to see 2 images!</div>
+
+    <script>
+        function showPortraitAlert() {
+            var portraitAlert = document.getElementById('portrait-alert');
+
+            // Check the initial orientation
+            checkOrientation();
+
+            // Listen for orientation changes
+            window.addEventListener('orientationchange', checkOrientation);
+
+            function checkOrientation() {
+                // Check if the device is in portrait mode
+                if (window.matchMedia("(orientation: portrait)").matches) {
+                    // Show the alert
+                    portraitAlert.style.display = 'block';
+                } else {
+                    // Hide the alert if not in portrait mode
+                    portraitAlert.style.display = 'none';
+                }
             }
-    
-            setTimeout(function () {
-                window.location.reload();
-            }, 5000);
+        }
+
+        // Call the function to start checking the orientation when the page loads
+        window.onload = showPortraitAlert;
+    </script>
+    <div id="info" style="margin: 0 auto;">
+        <h1>
+            <center>Visual Survey</center>
+        </h1>
+        <p>
+            <center><b>Please go through these images and choose the one that you like, click on submit to move on to
+                    the next pair.</center>
+        </p>
+    </div>
+    <div id='countdown_timer'>
+        <script>
+            var count = 5;
+            var timer = setInterval(function () {
+                count--;
+                if (count == 0) {
+                    clearInterval(timer);
+                }
+                document.getElementById("countdown").innerHTML = count;
+            }, 1000);
         </script>
-        <style>
-                .flex-container {
-                    display: flex;
-                    align-items: flex-end;
-                }
-                .flex2{
-                    max-width: '{{max_width_db}}'px;
-                    max-height: '{{max_height_db}}'px;
-                }
-    
-                img:hover {
-                    border: 2px solid red;
-                }
-        </style>
-    
-    </head>
-    
-    <body>
-        <div id="info" style="margin: 0 auto;">
-            <h1>
-                <center>Visual Survey</center>
-            </h1>
-            <p>
-                <center><b>Please go through these images and choose the one that you like, click on submit to move on to
-                        the next pair.</center>
-            </p>
-        </div>
-        <div id='countdown_timer'>
-            <script>
-                var count = 5;
-                var timer = setInterval(function () {
-                    count--;
-                    if (count == 0) {
-                        clearInterval(timer);
-                    }
-                    document.getElementById("countdown").innerHTML = count;
-                }, 1000);
-            </script>
-    
-            <!-- <script>
+
+        <!-- <script>
                 // Get references to both image buttons by their IDs
                 var image1 = document.getElementById("img_one");
                 var image2 = document.getElementById("img_two");
@@ -90,34 +131,34 @@
                 imageClickHandler(image2);
                 };
             </script> -->
-    
-            <!-- <h5><center>Countdown Timer</center></h5> -->
-            <h3>
-                <center><span id="countdown">5</span></center>
-            </h3>
-        </div>
-        <form id="surveyForm" method="post" action="/submit">
-            <input type="hidden" name="user_id" value="{{ user }}">
-            <!-- <input type="hidden" name="sess_id" value="{{ sess_id }}"> -->
-            <input type="hidden" name="survey" value="{{ survey_type }}">
-            <div id="img_container" class="flex-container">
-                <div id="imgs1" class = "flex2">
-                    <img src="{{ img1[1] }}" id = "img_one"
-                        onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
-                </div>
-                <div id="imgs2" class = "flex2">
-                    <img src="{{ img2[1] }}" id="img_two"
-                        onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
-                </div>
+
+        <!-- <h5><center>Countdown Timer</center></h5> -->
+        <h3>
+            <center><span id="countdown">5</span></center>
+        </h3>
+    </div>
+    <form id="surveyForm" method="post" action="/submit">
+        <input type="hidden" name="user_id" value="{{ user }}">
+        <!-- <input type="hidden" name="sess_id" value="{{ sess_id }}"> -->
+        <input type="hidden" name="survey" value="{{ survey_type }}">
+        <div id="img_container" class="flex-container">
+            <div id="imgs1" class="flex1">
+                <img src="{{ img1[1] }}" id="img_one" 
+                    onclick="submitForm('{{ img1[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
             </div>
-            <input type="hidden" id="selectionInput" name="selection">
-            <input type="hidden" id="img1Input" name="img1">
-            <input type="hidden" id="img2Input" name="img2">
-        </form>
-    </body>
-    
-    
-    </html>
-    
-    
-    {% endblock %}
+            <div id="imgs2" class="flex2">
+                <img src="{{ img2[1] }}" id="img_two" 
+                    onclick="submitForm('{{ img2[0] }}', '{{ img1[0] }}', '{{ img2[0] }}')">
+            </div>
+        </div>
+        <input type="hidden" id="selectionInput" name="selection">
+        <input type="hidden" id="img1Input" name="img1">
+        <input type="hidden" id="img2Input" name="img2">
+    </form>
+</body>
+
+
+</html>
+
+
+{% endblock %}

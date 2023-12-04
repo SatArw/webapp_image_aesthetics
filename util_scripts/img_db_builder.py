@@ -24,11 +24,13 @@ cloudinary.config(
 # Specify the folder you want to scrape
 folder_name = 'final_images'
 
+
 # Set up pagination for the API request
 next_cursor = None
 page_size = 100
 resourceS = []
 
+'''
 def upload_folder(folder_path, folder_name_in_cloudinary):
     for root, _, files in os.walk(folder_path):
         for file in files:
@@ -38,14 +40,15 @@ def upload_folder(folder_path, folder_name_in_cloudinary):
             result = upload(file_path, use_filename = True, unique_filename = False, folder="final_images")
             print(f"Uploaded: {file_path} => {result['secure_url']}")
 
-'''
-local_folder_path = "test"
-cloudinary_folder_name = "/final_images"
+
+local_folder_path = "resized_final/res"
+cloudinary_folder_name = "final_images"
 
 upload_folder(local_folder_path, cloudinary_folder_name)
-
 '''
+
 # Make API requests until all resources in the folder have been retrieved
+
 while True:
   # Make an API request to get the next batch of resources
   response = resources(type='upload', prefix=folder_name, max_results=page_size, next_cursor=next_cursor)
@@ -65,7 +68,7 @@ image_links = [resource['secure_url'] for resource in resourceS]
 db_name = "aspect_images"
 
 #lets clear all the data currently before inserting fresh data
-cur.execute(f"DELETE FROM {db_name}")
+#cur.execute(f"DELETE FROM {db_name}")
 
 #lets insert values
 for i in range(len(image_links)):
@@ -80,5 +83,4 @@ for i in range(len(image_links)):
      image_class = "1"
   print(split_link)
   cur.execute(f"INSERT INTO {db_name} (img_id, link, height, width, image_class) VALUES ({i+1}, \"{image_links[i]}\", {height}, {width}, {image_class});")
-
 conn.commit()

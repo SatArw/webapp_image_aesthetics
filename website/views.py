@@ -62,8 +62,20 @@ def home():
     cur.execute('SELECT distinct image_class FROM aspect_images')
     image_classes =  cur.fetchall()
     image_classes_unique = random.choice(image_classes)
-    cur.execute(f'SELECT img_id FROM aspect_images where image_class = {image_classes_unique[0]}')
-    links = cur.fetchall()
+    cur.execute(f'SELECT height FROM aspect_images where image_class = {image_classes_unique[0]} group by height ORDER BY COUNT(*) DESC LIMIT 1')
+    img_height =  cur.fetchall()
+    image_height_unique = random.choice(img_height)
+    cur.execute(f'SELECT width FROM aspect_images where image_class = {image_classes_unique[0]} group by width ORDER BY COUNT(*) DESC LIMIT 1')
+    img_width =  cur.fetchall()
+    image_width_unique = random.choice(img_width)
+    height_or_width = random.choice([0, 1])
+    links = []
+    if height_or_width == 0:
+        cur.execute(f'SELECT img_id FROM aspect_images where image_class = {image_classes_unique[0]} and height = {image_height_unique[0]}')
+        links = cur.fetchall()
+    if height_or_width == 1:
+        cur.execute(f'SELECT img_id FROM aspect_images where image_class = {image_classes_unique[0]} and width = {image_width_unique[0]}')
+        links = cur.fetchall()
     for i in range(0, len(links)):
         links[i] = links[i][0]
     session["links"] = links

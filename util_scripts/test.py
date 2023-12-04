@@ -18,6 +18,7 @@ conn = sqlite3.connect(
     "../img_db", check_same_thread=False)
 
 cur = conn.cursor()
+'''
 cur.execute('SELECT distinct image_class FROM aspect_images')
 img_class = cur.fetchall()
 dist_img_class = random.choice(img_class)
@@ -27,5 +28,8 @@ imgs = cur.fetchall()
 img_2 = [[0, 1], [0, 2]]
 cur.execute(f'SELECT max(width) from aspect_images')
 max_width = cur.fetchall()
-print(max_width[0][0])
+'''
+x = random.choice([1])
+print(x)
+#print(max_width[0][0])
 
