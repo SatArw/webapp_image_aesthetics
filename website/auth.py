@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db
+from . import db,mail
+from flask_mail import Message
 from flask_login import login_user, login_required, logout_user, current_user
 import random
 import string
@@ -98,7 +99,7 @@ def sign_up():
             flash('Password must be at least 7 characters.', category='error')
         else:
             new_user = User(email=email, first_name=first_name, password=generate_password_hash(
-                password1, method='sha256'), age=age, gender=gender, rod=rod)
+                password1, method='pbkdf2:sha256'), age=age, gender=gender, rod=rod)
             db.session.add(new_user)
             db.session.commit()
             # id = db.session.execute('SELECT ID FROM USER WHERE EMAIL = {}'.format(email))
@@ -108,5 +109,57 @@ def sign_up():
             login_user(new_user, remember=True)
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))
-
     return render_template("sign_up.html", user=current_user)
+
+@auth.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Generate a unique token for password reset
+            reset_token = user.generate_reset_token()
+
+            # Send an email with the reset link
+            send_reset_email(user.email, reset_token)
+
+            flash('Password reset link has been sent to your email.', category='success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Email not found. Please register.', category='error')
+
+    return render_template('forgot_password.html', user=current_user)
+
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    user = User.verify_reset_token(token)
+
+    if user is None:
+        flash('Invalid or expired token. Please request a new one.', category='error')
+        return redirect(url_for('auth.forgot_password'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if new_password == confirm_password:
+            user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+            user.reset_token = None
+            user.reset_token_expires = None
+            db.session.commit()
+
+            flash('Your password has been reset successfully.', category='success')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Passwords do not match. Please try again.', category='error')
+
+    return render_template('reset_password.html', user=current_user)
+def send_reset_email(email, reset_token):
+    msg = Message('Password Reset', recipients=[email])
+    reset_url = url_for('auth.reset_password', token=reset_token, _external=True)
+    msg.body = f"Click the following link to reset your password: {reset_url}"
+    mail.send(msg)
+
+
+   
