@@ -30,6 +30,4 @@ for filename in os.listdir(input_dir):
         cv.imwrite(os.path.join(output_dir,fname),new_img_b_const)
         fname = f"h_{r}_{filename}"
         cv.imwrite(os.path.join(output_dir,fname),new_img_h_const)
-
-
                        

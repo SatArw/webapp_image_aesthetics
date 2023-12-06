@@ -162,7 +162,6 @@ def select():
     i1 = random.choice(lis)
     lis.remove(i1)
     i2 = random.choice(lis)
-
     try:
         cursorObject.execute(
         f"SELECT img_id,link FROM {table_name} WHERE img_id={i1}")
@@ -177,17 +176,13 @@ def select():
         flash('Something went wrong with the database! Please re-take the survey',category='error')
         redirect(url_for('views.home'))   
     image2 = cursorObject.fetchone()
-
-   
-    
     session["start_time"] = time.time()
     imgs_chosen = []
     imgs_chosen.append(i1)
     imgs_chosen.append(i2)
     session["image_selection"].append(imgs_chosen)
     session["update_no"] = 0
-    return render_template('survey.html', img1=image1, img2=image2, user=current_user,
-                           survey_type=survey_type, max_width_db=max_width, max_height_db=max_height)
+    return render_template('survey.html', img1=image1, img2=image2, user=current_user,survey_type=survey_type, max_width_db=max_width, max_height_db=max_height)
 
 @ views.route('/submit', methods=['POST'])
 @ login_required
