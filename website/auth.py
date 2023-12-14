@@ -161,5 +161,11 @@ def send_reset_email(email, reset_token):
     msg.body = f"Click the following link to reset your password: {reset_url}"
     mail.send(msg)
 
+@auth.route('/thankyou')
+def thankyou():
+    user = conn_user.cursor()
+    return render_template('thankyou.html', user=user)
+
+
 
    

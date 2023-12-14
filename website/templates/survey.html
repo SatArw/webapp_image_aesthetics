@@ -8,6 +8,47 @@
     <title>Image Survey</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script>
+        // Add event listener for visibility change
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                // Pause the countdown when the tab is not active
+                clearInterval(countdownTimer);
+            } else {
+                // Resume the countdown when the tab becomes active
+                countdownTimer = setInterval(updateCountdown, 1000);
+            }
+        });
+
+        // Function to end the session
+        function endSession() {
+            // End the session here
+            // For example, you can redirect the user to a different page
+            window.location.href = "/thankyou";
+        }
+
+        // Modify the updateCountdown function
+        function updateCountdown() {
+            var count = document.getElementById("countdown").innerHTML;
+            count--;
+
+            // If countdown reaches 0, end the session
+            if (count == 0) {
+                endSession();
+            }
+
+            document.getElementById("countdown").innerHTML = count;
+        }
+
+        // Set a timeout to end the session if the user doesn't come back within 30 seconds
+        var endSessionTimeout;
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                endSessionTimeout = setTimeout(endSession, 30000);
+            } else {
+                clearTimeout(endSessionTimeout);
+            }
+        });
+
         function submitForm(selection, img1, img2, survey_type) {
             var form = document.getElementById("surveyForm");
             var selectionInput = document.getElementById("selectionInput");
