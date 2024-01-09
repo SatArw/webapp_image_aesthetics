@@ -37,7 +37,7 @@ img:hover {
     border: 2px solid red;
 }
 
-/* Add this media query for landscape mode no need to scroll*/ 
+/* Add this media query for landscape mode */
 @media screen and (max-width: 990px) and (orientation: landscape) {
     .flex2 {
         width: 45%; /* adjust as needed */
