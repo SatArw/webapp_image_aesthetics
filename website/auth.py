@@ -18,6 +18,11 @@ conn = sqlite3.connect(
 conn_user = sqlite3.connect(
     "./instance/database.db", check_same_thread=False)
 
+#add about us page
+@auth.route('/about')
+def aboutus():
+    return render_template('about.html')
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
