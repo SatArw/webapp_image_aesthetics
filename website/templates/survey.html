@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script>
         // Add event listener for visibility change
-        document.addEventListener("visibilitychange", function() {
+        document.addEventListener("visibilitychange", function () {
             if (document.hidden) {
                 // Pause the countdown when the tab is not active
                 clearInterval(countdownTimer);
@@ -19,37 +19,54 @@
             }
         });
 
-        // Function to end the session
-        function endSession() {
-            // End the session here
-            // For example, you can redirect the user to a different page
-            window.location.href = "/thankyou";
+        var imgOne = new Image();
+        var imgTwo = new Image();
+        var imagesLoaded = 0; // Track the number of loaded images
+
+        imgOne.src = "{{ img1[1] }}";
+        imgTwo.src = "{{ img2[1] }}";
+
+        function showImages() {
+            imagesLoaded++;
+            if (imagesLoaded === 2) {
+                // Both images are loaded, show them and start the countdown
+                var image1 = document.getElementById("img_one");
+                var image2 = document.getElementById("img_two");
+                var countdownTimerDiv = document.getElementById("countdown_timer");
+
+                image1.src = imgOne.src;
+                image1.style.display = "block";
+
+                image2.src = imgTwo.src;
+                image2.style.display = "block";
+
+                countdownTimerDiv.style.display = "block";
+
+                // Set up an interval to update the countdown every second
+                countdownTimer = setInterval(updateCountdown, 1000);
+            }
         }
 
-        // Modify the updateCountdown function
+        // Register the onload event for both images
+        imgOne.onload = imgTwo.onload = function () {
+            showImages();
+        };
+
+        // Function to update the countdown timer
         function updateCountdown() {
             var count = document.getElementById("countdown").innerHTML;
             count--;
 
-            // If countdown reaches 0, end the session
+            // If countdown reaches 0, reload the page
             if (count == 0) {
-                endSession();
+                window.location.reload();
             }
 
             document.getElementById("countdown").innerHTML = count;
         }
 
-        // Set a timeout to end the session if the user doesn't come back within 30 seconds
-        var endSessionTimeout;
-        document.addEventListener("visibilitychange", function() {
-            if (document.hidden) {
-                endSessionTimeout = setTimeout(endSession, 30000);
-            } else {
-                clearTimeout(endSessionTimeout);
-            }
-        });
-
-        function submitForm(selection, img1, img2, survey_type) {
+        // Function to submit the form
+        function submitForm(selection, img1, img2) {
             var form = document.getElementById("surveyForm");
             var selectionInput = document.getElementById("selectionInput");
             var img1Input = document.getElementById("img1Input");
@@ -69,46 +86,6 @@
             // Submit the form
             form.submit();
         }
-
-        // Preload images
-        var imgOne = new Image();
-        var imgTwo = new Image();
-        imgOne.src = "{{ img1[1] }}";
-        imgTwo.src = "{{ img2[1] }}";
-
-        // Function to show images after preloading
-        function showImages() {
-            var image1 = document.getElementById("img_one");
-            var image2 = document.getElementById("img_two");
-
-            image1.src = imgOne.src;
-            image1.style.display = "block";
-
-            image2.src = imgTwo.src;
-            image2.style.display = "block";
-        }
-
-        // Check if both images are loaded
-        imgOne.onload = imgTwo.onload = function () {
-            showImages();
-
-        };
-
-        // Function to update the countdown timer
-        function updateCountdown() {
-            var count = document.getElementById("countdown").innerHTML;
-            count--;
-
-            // If countdown reaches 0, reload the page
-            if (count == 0) {
-                window.location.reload();
-            }
-
-            document.getElementById("countdown").innerHTML = count;
-        }
-
-        // Set up an interval to update the countdown every second
-        var countdownTimer = setInterval(updateCountdown, 1000);
     </script>
 </head>
 
@@ -122,7 +99,7 @@
                     the next pair.</center>
         </p>
     </div>
-    <div id='countdown_timer'>
+    <div id='countdown_timer' style="display: none;">
         <h3>
             <center><span id="countdown">5</span></center>
         </h3>

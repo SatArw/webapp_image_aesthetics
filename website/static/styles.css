@@ -34,7 +34,7 @@ img {
 }
 
 img:hover {
-    border: 2px solid red;
+    border: 2px solid #331acc;
 }
 
 /* Add this media query for landscape mode */
