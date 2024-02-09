@@ -38,10 +38,11 @@ img:hover {
 }
 
 /* Add this media query for portrait mode */
-@media screen and (max-width: 990px) and (orientation: portrait) {
+/* @media screen and (max-width: 990px) and (orientation: portrait) { */
+    @media screen and (orientation: portrait){
     .flex2 {
         width: 100%; /* Display images one below the other in portrait mode */
-        height: 45vh; /* Adjusted height to fit both images within the screen */
+        height: 30vh; /* Adjusted height to fit both images within the screen */
         margin-bottom: 5%; /* Adjusted margin at the bottom for spacing */
     }
     
@@ -58,7 +59,7 @@ img:hover {
 
     img {
         height: 100%; /* adjust as needed */
-        object-fit: contain; /* this will ensure that images are scaled correctly */
+        object-fit:fill; /* this will ensure that images are scaled correctly */
     }
 }
 
