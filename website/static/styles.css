@@ -22,7 +22,7 @@ h1, h3, #countdown_timer {
     box-sizing: border-box;
     width: 48%; 
     margin: 1%;
-    max-height: 300px; 
+    max-height: 300px;
 }
 
 img {
@@ -34,10 +34,36 @@ img {
 }
 
 img:hover {
-    border: 2px solid red;
+    border: 2px solid #331acc;
 }
 
-/* Add this media query for landscape mode no need to scroll*/ 
+/* Add this media query for portrait mode */
+/* @media screen and (max-width: 990px) and (orientation: portrait) { */
+    @media screen and (orientation: portrait){
+    .flex2 {
+        width: 100%; /* Display images one below the other in portrait mode */
+        height: 30vh; /* Adjusted height to fit both images within the screen */
+        margin-bottom: 5%; /* Adjusted margin at the bottom for spacing */
+    }
+    
+    p {
+        font-size: 70%; 
+    }
+    h3 {
+        font-size: 90%; 
+    }
+    h1 {
+        font-size: 100%;
+        font-weight: bold;
+    }
+
+    img {
+        height: 100%; /* adjust as needed */
+        object-fit:fill; /* this will ensure that images are scaled correctly */
+    }
+}
+
+/* Add this media query for landscape mode */
 @media screen and (max-width: 990px) and (orientation: landscape) {
     .flex2 {
         width: 45%; /* adjust as needed */
